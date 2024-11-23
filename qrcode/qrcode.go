@@ -6,7 +6,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
+
+func sanitizeFileName(input string) string {
+	// Remove caracteres indesejados da URL
+	input = strings.ReplaceAll(input, "https://", "")
+	input = strings.ReplaceAll(input, "http://", "")
+	input = strings.ReplaceAll(input, "/", "-")
+	input = strings.ReplaceAll(input, ":", "-")
+	return strings.TrimSpace(input)
+}
 
 func main() {
 	fmt.Print("Insira url: ")
@@ -26,6 +36,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	os.WriteFile("qr-code.png", responseData, 0644)
+	fileName := "qr-code-[" + inputUrl + "]"
+	clearFileName := sanitizeFileName(fileName) + ".png"
+	os.WriteFile(clearFileName, responseData, 0644)
+	fmt.Println("Arquivo salvo. Nome:", clearFileName)
 }
